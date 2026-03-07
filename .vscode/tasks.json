@@ -2,11 +2,23 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "C/C++: g++.exe build active file",
+            "label": "Build C++ file",
             "type": "shell",
             "command": "g++",
             "args": ["-o", "${fileDirname}\\output\\${fileBasenameNoExtension}.exe", "${fileDirname}\\${fileBasename}"],
             "group": { "kind": "build", "isDefault": true }
+        },
+        {
+            "label": "Make new folder (for C++)",
+            "type": "shell",
+            "command": "if (!(Test-Path ${fileDirname}\\output)) {mkdir ${fileDirname}\\output}",
+        },
+        {
+            "label": "Folder maker and builder C++",
+            "dependsOn": [
+                "Make new folder (for C++)",
+                "Build C++ file"
+            ]
         }
     ]
 }

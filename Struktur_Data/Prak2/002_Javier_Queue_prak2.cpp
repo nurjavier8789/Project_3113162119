@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 using namespace std;
 
 struct bookshelf {
@@ -15,7 +16,55 @@ struct bookshelf {
 
 bookshelf *head = nullptr;
 
-string generateID(string title, int year) {
+struct book_borrow_data {
+    string id;
+    string BookID;
+    string title;
+    string name;
+    long long NIM;
+    string date;
+
+    book_borrow_data *next;
+};
+
+book_borrow_data *front = nullptr;
+book_borrow_data *rear = nullptr;
+int urutanPinjaman = 1;
+
+string getCurrentDate() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    char buf[80];
+    strftime(buf, sizeof(buf), "%d %B %Y %H:%M", ltm);
+    return string(buf);
+}
+
+string generateBorrowID(bookshelf *b, string name) {
+    time_t now = time(0);
+    tm* LocalTime = localtime(&now);
+    string TwoDigitYear = to_string(LocalTime->tm_year);
+
+    string id = b->id;
+
+    id += (char)tolower(b->genre[0]);
+
+    id += (to_string(LocalTime->tm_year)).substr(1, 2);
+
+    id += (char)tolower(name[0]);
+    id += (char)tolower(name[1]);
+
+    if (urutanPinjaman < 10) {
+        id += "0" + to_string(urutanPinjaman);
+        urutanPinjaman++;
+    } else {
+        id += to_string(urutanPinjaman);
+        urutanPinjaman++;
+    };
+
+    return id;
+}
+
+string generateIDBook(string title, int year) {
     int titleID = abs(int(title[title.length() - 1]) - int(title[0]));
     string realTitleID = (titleID < 10) ? "0" + to_string(titleID) : to_string(titleID).substr(0,2);
     
@@ -51,6 +100,31 @@ string generateID(string title, int year) {
     }
 }
 
+void initProgram(string judul, string author, int tahun, string genre) {
+    bookshelf *newBook = new bookshelf;
+
+    newBook->title = judul;
+    newBook->author = author;
+    newBook->year = tahun;
+    newBook->genre = genre;
+
+    newBook->id = generateIDBook(newBook->title, newBook->year);
+    newBook->available = true;
+
+    if (head == nullptr) {
+        head = newBook;
+        newBook->next = head;
+        newBook->prev = head;
+    } else {
+        bookshelf *tail = head->prev;
+        
+        tail->next = newBook;
+        newBook->prev = tail;
+        newBook->next = head;
+        head->prev = newBook;
+    }
+}
+
 void addBook() {
     bookshelf *newBook = new bookshelf;
 
@@ -68,7 +142,7 @@ void addBook() {
     cout << "Genre : > ";
     cin.ignore(); getline(cin, newBook->genre);
 
-    newBook->id = generateID(newBook->title, newBook->year);
+    newBook->id = generateIDBook(newBook->title, newBook->year);
     newBook->available = true;
 
     if (head == nullptr) {
@@ -218,7 +292,7 @@ void editBook() {
                 if (idPerluUpdate) {
                     string oldID = curr->id;
                     curr->id = "";
-                    curr->id = generateID(curr->title, curr->year);
+                    curr->id = generateIDBook(curr->title, curr->year);
                     cout << "Data Id " << oldID << " telah berubah menjadi " << curr->id << " !" << endl;
                     idPerluUpdate = false; 
                 } else {
@@ -309,6 +383,68 @@ void deleteBook() {
     }
 }
 
+void approvalBorrowBook() {
+    int choice;
+    int counter = 1;
+
+    do {
+        if (front == nullptr) {
+            system("cls");
+            cout << "======================================" << endl;
+            cout << "          PERMINTAAN PINJAMAN" << endl;
+            cout << "======================================" << endl;
+            cout << "Tidak ada pinjaman untuk diproses!!" << endl;
+            cout << "Tekan apapun untuk melanjutkan..." << endl;
+            system("pause>nul");
+            return;
+        }
+
+        system("cls");
+        cout << "======================================" << endl;
+        cout << "          PERMINTAAN PINJAMAN" << endl;
+        cout << "======================================\n" << endl;
+        cout << "PINJAMAN KE-" << counter << endl;
+        cout << "--------------------------------------" << endl;
+        cout << "| Id      : " << front->id << endl;
+        cout << "| Judul   : " << front->title << endl;
+        cout << "| Nama    : " << front->name << endl;
+        cout << "| NIM     : " << front->NIM << endl;
+        cout << "| Tanggal : " << front->date << endl;
+        cout << "--------------------------------------" << endl;
+        cout << "1. Setujui\n";
+        cout << "2. Tolak\n";
+        cout << "0. Keluar\n> ";
+        cin >> choice;
+    
+        if (choice == 1 || choice == 2) {
+            if (choice == 1) {
+                bookshelf *temp = head;
+                do {
+                    if (temp->id == front->BookID) {
+                        temp->available = false;
+                        break;
+                    }
+                    temp = temp->next;
+                } while (temp != head);
+            }
+    
+            book_borrow_data *hapus = front;
+            system("cls");
+            cout << "======================================" << endl;
+            cout << "          PERMINTAAN PINJAMAN" << endl;
+            cout << "======================================\n" << endl;
+            cout << "Pinjaman dengan id " << hapus->id << " telah diproses !!" << endl;
+            front = front->next;
+            if (front == nullptr) rear = nullptr;
+            delete hapus;
+            counter++;
+            
+            cout << "Tekan enter untuk melanjutkan...";
+            cin.ignore(); cin.get();
+        }
+    } while (choice != 0);
+}
+
 void dashboardEmploy() {
     int pilih = -1;
 
@@ -321,6 +457,7 @@ void dashboardEmploy() {
                 "|2. Tampilkan Data Buku\n"
                 "|3. Mengubah Data Buku\n"
                 "|4. Menghapus Data Buku\n"
+                "|5. Proses Permintaan Pinjaman\n"
                 "|0. Keluar\n"
                 "> ";
         cin >> pilih;
@@ -338,15 +475,57 @@ void dashboardEmploy() {
             case 4:
                 deleteBook();
                 break;
+            case 5:
+                approvalBorrowBook();
+                break;
             case 0:
                 return;
         }
     }
 }
 
+void borrowBook(bookshelf *book) {
+    book_borrow_data *DataBaru = new book_borrow_data;
+
+    cout << "\nMasukkan nama peminjam > ";
+    cin.ignore(); getline(cin, DataBaru->name);
+    cout << "Masukkan NIM peminjam > ";
+    cin.ignore(); cin >> DataBaru->NIM;
+
+    DataBaru->id = generateBorrowID(book, DataBaru->name);
+    DataBaru->title = book->title;
+    DataBaru->date = getCurrentDate();
+    DataBaru->BookID = book->id;
+    DataBaru->next = nullptr;
+
+    if (rear == nullptr) {
+        front = rear = DataBaru;
+    } else {
+        rear->next = DataBaru;
+        rear = DataBaru;
+    }
+
+    system("cls");
+    cout << "======================================\n"
+            "         DASHBOARD PENGUNJUNG\n"
+            "======================================\n";
+    cout << "Permintaan pinjaman telah berhasil dibuat !!" << endl;
+    cout << "--------------------------------------" << endl;
+    cout << "| Id      : " << DataBaru->id << endl;
+    cout << "| Judul   : " << DataBaru->title << endl;
+    cout << "| Nama    : " << DataBaru->name << endl;
+    cout << "| NIM     : " << DataBaru->NIM << endl;
+    cout << "| Tanggal : " << DataBaru->date << endl;
+    cout << "--------------------------------------" << endl;
+    cout << "Menunggu persetujuan pegawai...\n" << endl;
+
+    cout << "Tekan enter untuk melanjutkan...";
+    cin.ignore(); cin.get();
+}
+
 void dashboardGuest() {
     bookshelf *curr = head;
-    int pilih;
+    int pilih = -1;
 
     if (head == nullptr) {
         system("cls");
@@ -383,15 +562,18 @@ void dashboardGuest() {
             } else if (pilih == 2) {
                 curr = curr->prev;
             } else if (pilih == 3) {
-                cout << "Akan datang..." << endl;
-                cout << "Tekan enter untuk melanjutkan...";
-                cin.ignore(); cin.get();
+                borrowBook(curr);
             }
         } while (pilih != 0);
     }
 }
 
 int main() {
+    initProgram("BUMI MANUSIA", "Pramoedya Ananta Toer", 1980, "Fiksi");
+    initProgram("Jalanan", "Joko Kristian", 2020, "Non-fiksi");
+    initProgram("Dia sangat manis", "Budi Setyawan", 2019, "Fiksi");
+    initProgram("Tutorial Basic Java", "Devier", 2020, "Edukasi");
+    initProgram("Terkadang... Merenung...", "Cahyadi VSync", 2015, "Non-Fiksi");
     int pilih = 0;
 
     while (true) {

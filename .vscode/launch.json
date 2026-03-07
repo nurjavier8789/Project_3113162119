@@ -9,7 +9,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "preLaunchTask": "C/C++: g++.exe build active file"
+            "preLaunchTask": "Folder maker and builder C++"
         },
         {
             "name": "Python run",
