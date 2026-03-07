@@ -1,0 +1,30 @@
+modules = ["python-3.12", "java-graalvm22.3"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Run Python"
+mode = "sequential"
+author = 7736694
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python PBO/Praktikum/Playground.py"
+
+[[workflows.workflow]]
+name = "Run C++"
+mode = "sequential"
+author = 7736694
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "g++ \"Struktur_Data/2_Prak1/002_Javier_LinkedList_prak1.cpp\" -o \"Struktur_Data/output/output-program.exe\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "\"Struktur_Data/output/output-program.exe\""
