@@ -2,6 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "main",
+            "request": "launch",
+            "mainClass": "PBO.Praktikum.Percobaan4.main",
+            "projectName": "Project_3113162119_e36ace0c"
+        },
+        {
+            "type": "java",
+            "name": "main",
+            "request": "launch",
+            "mainClass": "PBO.Praktikum.Percobaan4.main",
+            "projectName": "Project_3113162119_f003c38d"
+        },
+        {
             "name": "C++ Compile and run",
             "type": "cppvsdbg",
             "request": "launch",
