@@ -3,17 +3,20 @@ import sys
 
 pygame.init()
 
+# Fixed number
 WIDTH, HEIGHT = 750, 700
 TILE_SIZE = 50
 FPS = 60
 
-BG_COLOR = (10, 5, 25)
-WALL_COLOR = (40, 40, 100)
-ITEM_COLOR = (255, 0, 255)
-PLAYER_COLOR = (0, 255, 255)
+# Colors
+BG_COLOR = (102, 38, 127)
+WALL_COLOR = (78, 31, 96)
+ITEM_COLOR = (0, 148, 255)
+PLAYER_COLOR = (253, 197, 230)
 TEXT_BOX_COLOR = (20, 20, 50)
-TERMINAL_COLOR = (255, 255, 0)
+TERMINAL_COLOR = (255, 70, 0)
 
+# Custom font
 try:
     font = pygame.font.Font('monaco.ttf', 30)
 except:
@@ -23,6 +26,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Betweenspace")
 clock = pygame.time.Clock()
 
+# Main object
 class GameObject:
     def __init__(self, x, y, color):
         self.rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
@@ -37,11 +41,12 @@ class Player(GameObject):
         self.inventory = []
 
     def move(self, dx, dy, walls):
+        # Copy Rect from __init__ GameObject for testing
         new_rect = self.rect.copy()
         new_rect.x += dx * TILE_SIZE
         new_rect.y += dy * TILE_SIZE
 
-        # WHAT'S THIS
+        # Check if player collide with wall or not using copy of themself
         collision = False
         for wall in walls:
             if new_rect.colliderect(wall.rect):
@@ -69,19 +74,22 @@ class NPC(GameObject):
         self.dialog_index = 0
 
     def interact(self):
+        # Show the dialogue one by one
         if self.dialog_index < len(self.dialog_list):
             text = self.dialog_list[self.dialog_index]
             self.dialog_index += 1
-            if self.name == "Asep" and self.dialog_index == len(self.dialog_list):
+            if self.name == "Asep" and self.dialog_index == len(self.dialog_list): # Special case
                 pygame.quit()
                 sys.exit()
             return f"[{self.name}]: {text}"
         else:
             self.dialog_index = 0
             return ""
-        
+
+# Init player
 player = Player(1, 1)
 
+# Init map
 MAZE_MAP = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
@@ -96,31 +104,34 @@ MAZE_MAP = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
+# Process map
 walls = []
-for r, row in enumerate(MAZE_MAP): # HERE
+for r, row in enumerate(MAZE_MAP):
     for c, tile in enumerate(row):
         if tile == 1: walls.append(Obstacle(c, r))
 
 gate = Obstacle(10, 5)
-walls.append(gate) # HERE
+walls.append(gate)
 
+# Dialogue list
 items = [
     NPC(11, 9, "Blocky", ["Halo! Aku Blocky!!", "Apa?"]),
-    NPC(5, 1, "Saturday", ["Whuh!?", "Kok aku disini??", "Tapi jujur, pintu keluarnya tidak terbuka.", "Sekarang apa?"]),
     NPC(5, 5, "Liz", ["Hah...", "Acid...", "Kemana lagi dia kali ini?", "Bikin orang khawatir aja..."]),
     NPC(9, 3, "Penjaga Pintu", ["Aku dengar ada seseorang yang tau clue ini.", "Mungkin explorasi akan membantu."]),
+    NPC(5, 1, "Saturday", ["Whuh!?", "Kok aku disini??", "Tapi jujur, pintu keluarnya tidak terbuka.", "Sekarang apa?"]),
+    NPC(13, 9, "Asep", ["Oh, kamu sudah membuka gerbang!", "Habis itu ngapain?", "Hmm... kurang tau juga sih.", "Ya...", ""]),
     NPC(1, 9, "???", ["Hai, aku punya kode tapi aku tidak tahu buat apa.", "Kamu mau tau?", "Ini kodenya-", "[ 7 12 9 20 3 8 ]"]),
-    NPC(13, 9, "Asep", ["Oh, kamu sudah membuka gerbang!", "Habis itu ngapain?", "Hmm... kurang tau juga sih.", "Ya...", ""])
 ]
 
+# Gate
 terminal = Terminal(9, 5, "GLITCH")
 
+# Init purpose
 current_text = "Gunakan Arrow Keys untuk bergerak, [ENTER] untuk interaksi."
 running = True
 user_input = ""
 is_typing = False
 
-# WHAT'S THIS
 while running:
     screen.fill(BG_COLOR)
 
@@ -132,9 +143,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if is_typing:
                 if event.key == pygame.K_RETURN:
-                    if user_input.upper() == terminal.secret_code: # HERE
+                    if user_input.upper() == terminal.secret_code: # Check if code is right or not
                         current_text = ""
-                        if gate in walls: walls.remove(gate) # HERE
+                        if gate in walls: walls.remove(gate)
                         terminal.is_hacked = True
                         is_typing = False
                     else:
@@ -152,18 +163,21 @@ while running:
                         user_input += event.unicode.upper()
             
             else:
-                if event.key == pygame.K_LEFT:  player.move(-1, 0, walls) # HERE
+                # Movement
+                if event.key == pygame.K_LEFT:  player.move(-1, 0, walls)
                 if event.key == pygame.K_RIGHT: player.move(1, 0, walls)
                 if event.key == pygame.K_UP:    player.move(0, -1, walls)
                 if event.key == pygame.K_DOWN:  player.move(0, 1, walls)
 
+                # Hint
                 if event.key == pygame.K_h: current_text = "Gunakan Arrow Keys untuk bergerak, [ENTER] untuk interaksi."
                 
+                # For interact
                 if event.key == pygame.K_RETURN:
-                    if player.rect.inflate(20, 20).colliderect(terminal.rect): # HERE
+                    if player.rect.inflate(20, 20).colliderect(terminal.rect):
                         if not terminal.is_hacked:
                             is_typing = True
-                            current_text = "[A1Z26] CODE: "
+                            current_text = "[A1Z26] KODE: "
                         else:
                             current_text = "Terminal sudah diretas."
                     else:
@@ -171,6 +185,7 @@ while running:
                             if player.rect.inflate(20, 20).colliderect(item.rect):
                                 current_text = item.interact()
 
+    # Render everything
     for wall in walls: wall.draw(screen)
     for item in items: item.draw(screen)
     terminal.draw(screen)
@@ -178,6 +193,7 @@ while running:
 
     display_msg = current_text + (user_input if is_typing else "")
 
+    # Showing the text box
     if display_msg != "":
         pygame.draw.rect(screen, TEXT_BOX_COLOR, (20, 580, 710, 100), border_radius=10)
         pygame.draw.rect(screen, PLAYER_COLOR, (20, 580, 710, 100), 2, border_radius=10)
