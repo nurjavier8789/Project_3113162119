@@ -38,7 +38,6 @@ class GameObject:
 class Player(GameObject):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_COLOR)
-        self.inventory = []
 
     def move(self, dx, dy, walls):
         # Copy Rect from __init__ GameObject for testing
