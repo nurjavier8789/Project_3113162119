@@ -1,6 +1,4 @@
-package PBO.Praktikum.Percobaan4;
-
-import PBO.Praktikum.Percobaan5.Mahasiswa;
+package PBO.Praktikum.Percobaan5;
 
 import java.util.Scanner;
 
@@ -22,8 +20,10 @@ public class main {
         angkatan = input.nextInt();
         
         System.out.println("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-        // Mahasiswa mhs1 = new Mahasiswa(nama, nim, kelas, angkatan);
-        // mhs1.tampilkanInformasi();
+        Mahasiswa mhs1 = new Mahasiswa(nama, nim, kelas, angkatan, "TekFor");
+        mhs1.tampilkanInformasi();
+
+        input.close();
     }
 
     public static void interIdentity() {
@@ -55,30 +55,18 @@ public class main {
         }
 
         System.out.println("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-        MahasiswaInternasional mhsinter1 = new MahasiswaInternasional(nama, nim, kelas, angkatan, bahasa, negaraAsal, nilai, statusVisaFR);
+        MahasiswaInternasional mhsinter1 = new MahasiswaInternasional(nama, nim, kelas, angkatan, "TekFor", bahasa, negaraAsal, nilai, statusVisaFR);
         mhsinter1.tampilkanInformasi(mataUang);
+
+        input.close();
     }
 
     public static void main(String[] args) {
-        // Untuk Percobaan 5 //
-        PBO.Praktikum.Percobaan5.Mahasiswa mhsP5 = new PBO.Praktikum.Percobaan5.Mahasiswa("Alfandi", "123", "G", 19, "Teknik Informatika");
+        Mahasiswa mhs1 = new Mahasiswa("Alfandi", "123", "G", 19, "Teknik Informatika");
 
-        System.out.println(mhsP5.nama); 
-        System.out.println(mhsP5.nim);
-        // System.out.println(mhsP5.jurusanDefault);
-        // System.out.println(mhsP5.jurusanProtected);
-        // Untuk Percobaan 5 //
-
-        Scanner input = new Scanner(System.in);
-
-        System.out.print("Are you international students? (y/n)\n> ");
-        isInterConfirm = input.next();
-
-        if (isInterConfirm.equalsIgnoreCase("y")) {
-            interIdentity();
-        } else if (isInterConfirm.equalsIgnoreCase("n")) {
-            identityMhs();
-        }
-
+        System.out.println(mhs1.nama); 
+        System.out.println(mhs1.nim);
+        System.out.println(mhs1.jurusanDefault);
+        System.out.println(mhs1.jurusanProtected);
     }
 }
