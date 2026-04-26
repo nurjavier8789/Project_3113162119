@@ -18,7 +18,7 @@ void initProgram(string namaPlayer, int skorPlayer, double akurasiPlayer) {
     newPlayer->playerName = namaPlayer;
     newPlayer->playerScore = skorPlayer;
     newPlayer->playerAcc = akurasiPlayer;
-
+    
     newPlayer->next = head;
     head = newPlayer;
 }
@@ -26,8 +26,10 @@ void initProgram(string namaPlayer, int skorPlayer, double akurasiPlayer) {
 void SplitList(PlayerData* source, PlayerData** frontRef, PlayerData** backRef) {
     PlayerData* fast;
     PlayerData* slow;
+
     slow = source;
     fast = source->next;
+
     while (fast != nullptr) {
         fast = fast->next;
         if (fast != nullptr) {
@@ -35,6 +37,7 @@ void SplitList(PlayerData* source, PlayerData** frontRef, PlayerData** backRef) 
             fast = fast->next;
         }
     }
+
     *frontRef = source;
     *backRef = slow->next;
     slow->next = nullptr;
@@ -42,6 +45,7 @@ void SplitList(PlayerData* source, PlayerData** frontRef, PlayerData** backRef) 
 
 PlayerData* MergeScore(PlayerData* a, PlayerData* b) {
     PlayerData* result = nullptr;
+
     if (a == nullptr) return b;
     else if (b == nullptr) return a;
 
@@ -52,11 +56,13 @@ PlayerData* MergeScore(PlayerData* a, PlayerData* b) {
         result = b;
         result->next = MergeScore(a, b->next);
     }
+
     return result;
 }
 
 PlayerData* MergeAcc(PlayerData* a, PlayerData* b) {
     PlayerData* result = nullptr;
+
     if (a == nullptr) return b;
     else if (b == nullptr) return a;
 
@@ -67,6 +73,7 @@ PlayerData* MergeAcc(PlayerData* a, PlayerData* b) {
         result = b;
         result->next = MergeAcc(a, b->next);
     }
+
     return result;
 }
 
@@ -86,13 +93,16 @@ void MergeSort(PlayerData** headRef, bool sortByScore) {
 
 void DisplayList() {
     PlayerData* temp = head;
+
     cout << "\nRank\tNama\t\tSkor\tAkurasi" << endl;
     int rank = 1;
+
     while (temp != nullptr) {
         cout << rank++ << "\t" << temp->playerName << "\t" << temp->playerScore << "\t" << temp->playerAcc << "%" << endl;
         temp = temp->next;
     }
     cout << "======================================" << endl;
+
     system("pause");
 }
 
