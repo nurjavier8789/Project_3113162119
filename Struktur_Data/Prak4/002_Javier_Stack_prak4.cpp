@@ -2,6 +2,14 @@
 
 using namespace std;
 
+void clearScreen() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
 struct PlayerData {
     string playerName;
     int playerScore;
@@ -103,7 +111,9 @@ void DisplayList() {
     }
     cout << "======================================" << endl;
 
-    system("pause");
+    cout << "Tekan Enter untuk melanjutkan...";
+    cin.ignore();
+    cin.get();
 }
 
 void SortByScore() {
@@ -126,7 +136,7 @@ int main() {
     int pilih = 0;
 
     while (true) {
-        system("cls");
+        clearScreen();
         cout << "======================================" << endl;
         cout << "           SELAMAT DATANG" << endl;
         cout << "======================================" << endl;
