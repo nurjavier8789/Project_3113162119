@@ -11,7 +11,7 @@
         {
             "label": "Make new folder (for C++)",
             "type": "shell",
-            "command": "if (!(Test-Path ${fileDirname}\\output)) {mkdir ${fileDirname}\\output}",
+            "command": "if not exist ${fileDirname}\\output mkdir ${fileDirname}\\output",
         },
         {
             "label": "Folder maker and builder C++",
