@@ -23,8 +23,8 @@ author = 7736694
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "g++ \"Struktur_Data/Prak4/002_Javier_Stack_prak4.cpp\" -o \"Struktur_Data/Prak4/output/output-program.exe\""
+args = "g++ \"Struktur_Data/Prak5/002_Javier_TreeGraph_prak5.cpp\" -o \"Struktur_Data/Prak5/output/output-program.exe\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "\"Struktur_Data/Prak4/output/output-program.exe\""
+args = "\"Struktur_Data/Prak5/output/output-program.exe\""
