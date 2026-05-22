@@ -36,6 +36,15 @@ struct TreeNode {
 };
 TreeNode* rootTree = nullptr;
 
+// Lowering case
+string toLower(string str) {
+    string result = str;
+    for (int i = 0; i < result.length(); i++) {
+        result[i] = tolower(result[i]);
+    }
+    return result;
+}
+
 const int HASH_SIZE = 50;
 Beatmap* hashTable[HASH_SIZE];
 
@@ -54,7 +63,7 @@ struct GraphNode {
 GraphNode* recommendationGraph[100]; 
 int graphSize = 0;
 
-// Add Beatmap
+// Add Beatmap to linked list
 void insertToLinkedList(Beatmap newBeatmap) {
     LLNode *newNode = new LLNode;
     newNode->data = newBeatmap;
@@ -72,10 +81,44 @@ void insertToLinkedList(Beatmap newBeatmap) {
     }
 }
 
+// Add beatmap title to hash
+void insertToHash(Beatmap b) {
+    Beatmap* newMap = new Beatmap{b.title, b.artist, b.stars, b.bpm};
+    
+    int idx = getHash(toLower(newMap->title));
+    
+    while (hashTable[idx] != nullptr) {
+        idx = (idx + 1) % HASH_SIZE;
+    }
+    
+    hashTable[idx] = newMap;
+}
+
+// Insert beatmap data into tree
+TreeNode* insertToTree(TreeNode* root, Beatmap newMap) {
+    if (root == nullptr) {
+        TreeNode* newNode = new TreeNode;
+        newNode->data = newMap;
+        newNode->left = nullptr;
+        newNode->right = nullptr;
+        return newNode;
+    }
+
+    if (newMap.stars < root->data.stars) {
+        root->left = insertToTree(root->left, newMap);
+    } 
+    else {
+        root->right = insertToTree(root->right, newMap);
+    }
+    return root;
+}
+
 void addNewBeatmap(string title, string artist, double diff, int bpm) {
     Beatmap newMap = {title, artist, diff, bpm};
 
     insertToLinkedList(newMap);
+    insertToHash(newMap);
+    rootTree = insertToTree(rootTree, newMap);
 }
 
 // Menu 1 Download Baru (kayak nambah lagu baru ke linkedlist)
@@ -91,7 +134,7 @@ void enqueueDownload(Beatmap newMap) {
     } else {
         rearQueue->next = newNode;
         rearQueue = newNode;
-        cout << "[+] " << newMap.title << " masuk ke antrean download.";
+        cout << "[+] " << newMap.title << " masuk ke antrean download." << endl;
     }
 }
 
@@ -148,6 +191,21 @@ void viewBeatmap() {
     cin.ignore(); cin.get();
 }
 
+// Menu 5 Filter Bintang
+void filterByStars(TreeNode* root, double minStars, double maxStars, bool &found) {
+    if (root == nullptr) return;
+
+    filterByStars(root->left, minStars, maxStars, found);
+
+    if (root->data.stars >= minStars && root->data.stars <= maxStars) {
+        cout << "- " << root->data.title << " - " << root->data.artist 
+             << " | Stars: " << root->data.stars << "* | BPM: " << root->data.bpm << endl;
+        found = true;
+    }
+
+    filterByStars(root->right, minStars, maxStars, found);
+}
+
 int main() {
     for(int i = 0; i < HASH_SIZE; i++) hashTable[i] = nullptr;
 
@@ -167,8 +225,8 @@ int main() {
         cout << "1. Download Beatmap Baru (Done)" << endl;
         cout << "2. Proses Antrean Download (Done)" << endl;
         cout << "3. Lihat Playlist (Done)" << endl;
-        cout << "4. Cari Judul ()" << endl;
-        cout << "5. Filter Bintang ()" << endl;
+        cout << "4. Cari Judul Lagu (Done)" << endl;
+        cout << "5. Filter Bintang (Done)" << endl;
         cout << "6. Lihat Rekomendasi ()" << endl;
         cout << "7. History Terakhir ()" << endl;
         cout << "0. Keluar" << endl;
@@ -202,7 +260,7 @@ int main() {
             
             enqueueDownload(mapBaru); 
             
-            cout << "Tekan Enter untuk kembali...";
+            cout << "Tekan Enter untuk melanjutkan...";
             cin.ignore(); cin.get();
         } else if (menu == 2) {
             system("clear");
@@ -212,10 +270,67 @@ int main() {
 
             processDownload();
             
-            cout << "\nTekan Enter untuk kembali...";
+            cout << "\nTekan Enter untuk melanjutkan...";
             cin.ignore(); cin.get();
         } else if (menu == 3) {
             viewBeatmap();
+        } else if (menu == 4) {
+            string query;
+            system("clear");
+            cout << "======================================" << endl;
+            cout << "           CARI JUDUL LAGU" << endl;
+            cout << "======================================" << endl;
+            cin.ignore();
+            cout << "Masukkan Judul Beatmap: ";
+            getline(cin, query);
+            
+            int idx = getHash(toLower(query));
+            bool found = false;
+
+            for (int i = 0; i < HASH_SIZE; i++) {
+                int currentIdx = (idx + i) % HASH_SIZE;
+                
+                if (hashTable[currentIdx] != nullptr && toLower(hashTable[currentIdx]->title) == toLower(query)) {
+                    cout << "\n[Ditemukan]: " << hashTable[currentIdx]->title << " - " << hashTable[currentIdx]->artist;
+                    cout << "\nStars: " << hashTable[currentIdx]->stars << " | BPM: " << hashTable[currentIdx]->bpm << endl;
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                cout << "\nBeatmap '" << query << "' tidak ditemukan." << endl;
+            }
+
+            cout << "\nTekan Enter untuk melanjutkan...";
+            cin.get();
+        } else if (menu == 5) {
+            double minStars, maxStars;
+
+            system("clear");
+            cout << "======================================" << endl;
+            cout << "            FILTER BINTANG" << endl;
+            cout << "======================================" << endl;
+            cout << "(Masukkan angka desimal)" << endl;
+            cout << "Masukkan Minimum Tingkat Kesulitan: ";
+            cin >> minStars;
+            cout << "Masukkan Maksimal Tingkat Kesulitan: ";
+            cin >> maxStars;
+
+            system("clear");
+            cout << "======================================" << endl;
+            cout << "            FILTER BINTANG" << endl;
+            cout << "======================================" << endl;
+            cout << "Hasil Filter Tingkat Kesulitan range " << minStars << " - " << maxStars << ":" << endl;
+            bool found = false;
+
+            filterByStars(rootTree, minStars, maxStars, found);
+
+            if (!found) {
+                cout << "Tidak ada beatmap yang memenuhi kriteria bintang tersebut";
+            }
+
+            cout << "\nTekan Enter untuk melanjutkan...";
+            cin.ignore(); cin.get();
         } else if (menu == 0) break;
     }
     return 0;
