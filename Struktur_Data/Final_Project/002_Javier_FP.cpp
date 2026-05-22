@@ -113,12 +113,54 @@ TreeNode* insertToTree(TreeNode* root, Beatmap newMap) {
     return root;
 }
 
+void insertToGraph(Beatmap newMap) {
+    if (graphSize >= 100) return;
+
+    GraphNode* newNode = new GraphNode;
+    newNode->data = newMap;
+    newNode->similarMaps = nullptr;
+
+    for (int i = 0; i < graphSize; i++) {
+        GraphNode* existingNode = recommendationGraph[i];
+
+        int diffBPM = existingNode->data.bpm - newNode->data.bpm;
+        if (diffBPM < 0) {
+            diffBPM = -diffBPM;
+        }
+
+        if (toLower(existingNode->data.artist) == toLower(newNode->data.artist) || diffBPM <= 20) {
+            LLNode* edge1 = new LLNode;
+            edge1->data = existingNode->data;
+            edge1->next = newNode->similarMaps;
+            newNode->similarMaps = edge1;
+
+            LLNode* edge2 = new LLNode;
+            edge2->data = newNode->data;
+            edge2->next = existingNode->similarMaps;
+            existingNode->similarMaps = edge2;
+        }
+    }
+
+    recommendationGraph[graphSize] = newNode;
+    graphSize++;
+}
+
+void pushToHistory(Beatmap b) {
+    SNode* newNode = new SNode;
+    newNode->data = b;
+    
+    newNode->next = topStack; 
+    
+    topStack = newNode;
+}
+
 void addNewBeatmap(string title, string artist, double diff, int bpm) {
     Beatmap newMap = {title, artist, diff, bpm};
 
     insertToLinkedList(newMap);
     insertToHash(newMap);
     rootTree = insertToTree(rootTree, newMap);
+    insertToGraph(newMap);
 }
 
 // Menu 1 Download Baru (kayak nambah lagu baru ke linkedlist)
@@ -159,9 +201,10 @@ void processDownload() {
     cout << "\n[V] DOWNLOAD SELESAI: " << finishedMap.title << endl;
 
     addNewBeatmap(finishedMap.title, finishedMap.artist, finishedMap.stars, finishedMap.bpm);
+
+    pushToHistory(finishedMap);
 }
 
-// Menu 3 Lihat Playlist
 void viewBeatmap() {
     if (headPlaylist == nullptr) {
         system("clear");
@@ -191,7 +234,32 @@ void viewBeatmap() {
     cin.ignore(); cin.get();
 }
 
-// Menu 5 Filter Bintang
+void sortPlaylistByBPM() {
+    if (headPlaylist == nullptr || headPlaylist->next == nullptr) return;
+    
+    bool swapped;
+    LLNode* ptr1;
+    LLNode* lptr = nullptr;
+    
+    do {
+        swapped = false;
+        ptr1 = headPlaylist;
+        
+        while (ptr1->next != lptr) {
+            if (ptr1->data.bpm > ptr1->next->data.bpm) { 
+                Beatmap temp = ptr1->data;
+                ptr1->data = ptr1->next->data;
+                ptr1->next->data = temp;
+                swapped = true;
+            }
+            ptr1 = ptr1->next;
+        }
+        lptr = ptr1;
+    } while (swapped);
+    
+    cout << "\n[+] Playlist berhasil diurutkan berdasarkan BPM (Terkecil -> Terbesar)!" << endl;
+}
+
 void filterByStars(TreeNode* root, double minStars, double maxStars, bool &found) {
     if (root == nullptr) return;
 
@@ -206,13 +274,37 @@ void filterByStars(TreeNode* root, double minStars, double maxStars, bool &found
     filterByStars(root->right, minStars, maxStars, found);
 }
 
+void searchByArtist(string targetArtist) {
+    LLNode* temp = headPlaylist;
+    bool found = false;
+    int count = 1;
+    
+    while (temp != nullptr) {
+        if (toLower(temp->data.artist) == toLower(targetArtist)) {
+            cout << count << ". " << temp->data.title << " | Stars: " << temp->data.stars << "* | BPM: " << temp->data.bpm << endl;
+            found = true;
+            
+            pushToHistory(temp->data);
+            count++;
+        }
+        temp = temp->next;
+    }
+    
+    if (!found) {
+        cout << "Tidak ditemukan beatmap dari artist '" << targetArtist << "'." << endl;
+    }
+}
+
 int main() {
     for(int i = 0; i < HASH_SIZE; i++) hashTable[i] = nullptr;
 
     addNewBeatmap("7 Wonders", "Sakuzyo", 5.7, 168);
+    addNewBeatmap("AFTER PANDORA", "Sakuzyo", 3.6, 85);
     addNewBeatmap("CHUTEN", "t+pazolite", 6.2, 125);
+    addNewBeatmap("Valsqotch", "owl*tree", 8.2, 125);
     addNewBeatmap("IF:U", "MisoilePunch", 4.2, 190);
     addNewBeatmap("Tsunagite", "rintaro soma", 3.8, 88);
+    addNewBeatmap("Solips", "rintaro soma", 5.9, 199);
     addNewBeatmap("Apollo", "TJ.hangneil", 6.6, 339);
     addNewBeatmap("over the top", "xi", 9.71, 202);
 
@@ -222,13 +314,15 @@ int main() {
         cout << "======================================" << endl;
         cout << "           BEATMAP LISTING" << endl;
         cout << "======================================" << endl;
-        cout << "1. Download Beatmap Baru (Done)" << endl;
-        cout << "2. Proses Antrean Download (Done)" << endl;
-        cout << "3. Lihat Playlist (Done)" << endl;
-        cout << "4. Cari Judul Lagu (Done)" << endl;
-        cout << "5. Filter Bintang (Done)" << endl;
-        cout << "6. Lihat Rekomendasi ()" << endl;
-        cout << "7. History Terakhir ()" << endl;
+        cout << "1. Download Beatmap Baru" << endl;
+        cout << "2. Proses Antrean Download" << endl;
+        cout << "3. Lihat Playlist" << endl;
+        cout << "4. Urutkan Beatmap Berdasarkan BPM" << endl;
+        cout << "5. Cari Judul Lagu" << endl;
+        cout << "6. Cari Artist Lagu" << endl;
+        cout << "7. Filter Bintang" << endl;
+        cout << "8. Lihat Rekomendasi" << endl;
+        cout << "9. Riwayat" << endl;
         cout << "0. Keluar" << endl;
         cout << "> ";
         cin >> menu;
@@ -275,6 +369,9 @@ int main() {
         } else if (menu == 3) {
             viewBeatmap();
         } else if (menu == 4) {
+            sortPlaylistByBPM();
+            viewBeatmap();
+        } else if (menu == 5) {
             string query;
             system("clear");
             cout << "======================================" << endl;
@@ -294,6 +391,8 @@ int main() {
                     cout << "\n[Ditemukan]: " << hashTable[currentIdx]->title << " - " << hashTable[currentIdx]->artist;
                     cout << "\nStars: " << hashTable[currentIdx]->stars << " | BPM: " << hashTable[currentIdx]->bpm << endl;
                     found = true;
+
+                    pushToHistory(*(hashTable[currentIdx]));
                 }
             }
 
@@ -303,7 +402,22 @@ int main() {
 
             cout << "\nTekan Enter untuk melanjutkan...";
             cin.get();
-        } else if (menu == 5) {
+        } else if (menu == 6) {
+            string input;
+
+            system("clear");
+            cout << "======================================" << endl;
+            cout << "           CARI ARTIST LAGU" << endl;
+            cout << "======================================" << endl;
+            cin.ignore();
+            cout << "Masukkan Artist Beatmap: ";
+            getline(cin, input);
+
+            searchByArtist(input);
+
+            cout << "\nTekan Enter untuk melanjutkan...";
+            cin.get();
+        } else if (menu == 7) {
             double minStars, maxStars;
 
             system("clear");
@@ -330,6 +444,75 @@ int main() {
             }
 
             cout << "\nTekan Enter untuk melanjutkan...";
+            cin.ignore(); cin.get();
+        } else if (menu == 8) {
+            string query;
+
+            system("clear");
+            cout << "======================================" << endl;
+            cout << "         REKOMENDASI BEATMAP" << endl;
+            cout << "======================================" << endl;
+            cin.ignore();
+
+            cout << "Masukkan Judul Lagu yang Anda Suka: ";
+            getline(cin, query);
+
+            bool foundInGraph = false;
+
+            for (int i = 0; i < graphSize; i++) {
+                if (toLower(recommendationGraph[i]->data.title) == toLower(query)) {
+                    foundInGraph = true;
+                    cout << "\nKarena Anda menyukai '" << recommendationGraph[i]->data.title << "'," << endl;
+                    cout << "Kami merekomendasikan beatmap berikut yang mirip Artist atau BPM nya:" << endl;
+                    cout << "======================================" << endl;
+                    
+                    LLNode* tempEdge = recommendationGraph[i]->similarMaps;
+                    if (tempEdge == nullptr) {
+                        cout << "(Belum ada rekomendasi yang mirip dengan lagu ini)" << endl;
+                    } else {
+                        int recCount = 1;
+                        while (tempEdge != nullptr) {
+                            cout << recCount << ". " << tempEdge->data.title << " - " << tempEdge->data.artist << " | BPM: " << tempEdge->data.bpm << endl;
+                            tempEdge = tempEdge->next;
+                            recCount++;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (!foundInGraph) {
+                cout << "\nLagu '" << query << "' belum ada di database, tidak bisa memberi rekomendasi." << endl;
+            }
+
+            cout << "\nTekan Enter untuk melanjutkan...";
+            cin.get();
+        } else if (menu == 9) {
+            system("clear");
+            cout << "======================================" << endl;
+            cout << "                RIWAYAT" << endl;
+            cout << "======================================" << endl;
+
+            if (topStack == nullptr) {
+                cout << "Belum ada riwayat aktivitas. Coba download atau cari lagu terlebih dahulu." << endl;
+            } else {
+                SNode* temp = topStack;
+                int count = 1;
+                
+                while (temp != nullptr) {
+                    if (count == 1) {
+                        cout << "[Paling Baru] ";
+                    } else {
+                        cout << "              ";
+                    }
+                    cout << count << ". " << temp->data.title << " - " << temp->data.artist << endl;
+                    
+                    temp = temp->next;
+                    count++;
+                }
+            }
+
+            cout << "\nTekan Enter untuk kembali...";
             cin.ignore(); cin.get();
         } else if (menu == 0) break;
     }
