@@ -19,6 +19,30 @@
                 "Make new folder (for C++)",
                 "Build C++ file"
             ]
+        },
+        {
+            "label": "C/C++: g++ build active file Linux",
+            "type": "cppbuild",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-std=c++17",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/output/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Compiler untuk C++"
         }
     ]
 }
