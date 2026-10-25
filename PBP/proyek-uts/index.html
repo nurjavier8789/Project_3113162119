@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Pernikahan - Romeo & Juliet</title>
+    <!-- Memanggil Bootstrap CSS dari CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Memanggil CSS buatan sendiri -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Bagian Hero / Tampilan Awal -->
+    <header class="hero-section d-flex align-items-center justify-content-center text-center text-white">
+        <div class="container">
+            <h4 class="mb-3">The Wedding Of</h4>
+            <h1 class="display-3 fw-bold mb-4 font-aesthetic">Romeo & Juliet</h1>
+            <p class="lead mb-4">Kami mengundang Bapak/Ibu/Saudara/i untuk hadir pada hari bahagia kami.</p>
+            
+            <!-- Tempat untuk Hitung Mundur (JS) -->
+            <div id="countdown" class="d-flex justify-content-center gap-3 mb-4"></div>
+            
+            <a href="#details" class="btn btn-light btn-lg rounded-pill px-4 shadow">Buka Undangan</a>
+        </div>
+    </header>
+
+    <!-- Bagian Detail Acara -->
+    <section id="details" class="py-5 bg-light text-center">
+        <div class="container">
+            <h2 class="mb-5 font-aesthetic">Detail Acara</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-5 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body py-5">
+                            <h3 class="card-title font-aesthetic mb-3">Akad Nikah</h3>
+                            <p class="card-text"><strong>Minggu, 15 Desember 2026</strong></p>
+                            <p class="card-text">08:00 WIB - Selesai</p>
+                            <p class="card-text text-muted">Masjid Agung Surabaya<br>Jl. Contoh Alamat No. 123</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body py-5">
+                            <h3 class="card-title font-aesthetic mb-3">Resepsi</h3>
+                            <p class="card-text"><strong>Minggu, 15 Desember 2026</strong></p>
+                            <p class="card-text">11:00 WIB - Selesai</p>
+                            <p class="card-text text-muted">Gedung Serbaguna Surabaya<br>Jl. Contoh Alamat No. 456</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Memanggil Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Memanggil file JS buatan sendiri -->
+    <script src="script.js"></script>
+</body>
+</html>
