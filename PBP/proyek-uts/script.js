@@ -1,5 +1,5 @@
 // Menentukan tanggal pernikahan
-const weddingDate = new Date("Dec 15, 2026 08:00:00").getTime();
+const weddingDate = new Date("Dec 24, 2026 08:00:00").getTime();
 
 // Memperbarui hitungan mundur setiap 1 detik
 const countdownFunction = setInterval(function() {
