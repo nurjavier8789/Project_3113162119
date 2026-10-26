@@ -34,3 +34,23 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+#profil {
+    background-color: #ffffff;
+}
+
+.profil-img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border: 5px solid #f8f9fa;
+}
+
+.profil-card {
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.profil-card:hover {
+    transform: translateY(-5px);
+}
