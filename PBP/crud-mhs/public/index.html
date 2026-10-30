@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CRUD Mahasiswa</title>
+</head>
+<body>
+    <h1>Data Mahasiswa</h1>
+    <form id="formMahasiswa">
+        <input id="nim" placeholder="NIM" required>
+        <input id="nama" placeholder="Nama" required>
+        <input id="prodi" placeholder="Program Studi" required>
+
+        <button type="submit" id="btnSimpan">Simpan</button>
+        <button type="button" id="btnBatal">Batal</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+            <th>NIM</th><th>Nama</th>
+            <th>Program Studi</th><th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="dataMahasiswa"></tbody>
+    </table>
+    <p id="pesan" role="status"></p>
+
+    <script src="script.js"></script>
+</body>
+</html>
