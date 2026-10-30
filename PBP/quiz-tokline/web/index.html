@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Toko Online Sederhana</title>
+</head>
+<body>
+    <h1>Daftar Produk</h1>
+    <form id="formProduk">
+        <input id="nama-produk" placeholder="Nama Produk" required>
+        <input id="harga" placeholder="Harga" required>
+        <input id="stok" placeholder="Stok" required>
+
+        <button type="submit" id="btnSimpan">Simpan</button>
+        <button type="button" id="btnBatal">Batal</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kode Produk</th>
+                <th>Nama Produk</th>
+                <th>Harga</th>
+                <th>Stok</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="dataProduk"></tbody>
+    </table>
+    <p id="pesan" role="status"></p>
+
+    <script src="script.js"></script>
+</body>
+</html>
