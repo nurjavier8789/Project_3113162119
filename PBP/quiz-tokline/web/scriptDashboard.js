@@ -71,24 +71,26 @@ async function beliItem(m) {
 async function bulkBeli(m) {
   let input = prompt("Masukkan jumlah barang yang ingin dibeli:", "1");
 
-  const minusStok = m.stok - input;
-
-  const bodyField = {
-    'stok': minusStok
-  };
-
-  try {
-    const url = API + '/beli/' + m.kode_produk;
-    const res = await fetch(url, {
-      method: 'put',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(bodyField)
-    });
-    if (!res.ok) throw new Error('Gagal menyimpan data');
-    await muatData();
-    tampilPesan('Membeli ' + input + ' ' + m.nama_produk + '!');
-  } catch (e) {
-    tampilPesan(e.message);
+  if (input != null) {
+    const minusStok = m.stok - input;
+  
+    const bodyField = {
+      'stok': minusStok
+    };
+  
+    try {
+      const url = API + '/beli/' + m.kode_produk;
+      const res = await fetch(url, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(bodyField)
+      });
+      if (!res.ok) throw new Error('Gagal menyimpan data');
+      await muatData();
+      tampilPesan('Membeli ' + input + ' ' + m.nama_produk + '!');
+    } catch (e) {
+      tampilPesan(e.message);
+    }
   }
 }
 
