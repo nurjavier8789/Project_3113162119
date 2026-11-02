@@ -53,4 +53,21 @@ app.delete('/api/tokline/:kode_produk', async (req, res) => {
   } catch (err) { res.sendStatus(500); }
 });
 
+app.put('/api/tokline/beli/:kode_produk', async (req, res) => {
+  const stok = req.body.stok;
+  if (!stok)
+    return res.status(400).json({ pesan: 'Mohon untuk mengisi jumlah stok' });
+  try {
+    const [hasil] = await db.execute(
+      'UPDATE produk SET stok=? WHERE kode_produk=?',
+      [stok, req.params.kode_produk]
+    );
+    if (!hasil.affectedRows) return res.sendStatus(404);
+    res.json({ pesan: 'Data diperbarui' });
+  } catch (err) {
+    res.sendStatus(500);
+    console.warn(err);
+  }
+});
+
 app.listen(1660, () => console.log("Done!"))

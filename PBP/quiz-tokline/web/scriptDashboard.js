@@ -1,6 +1,5 @@
 const API = '/api/tokline';
 const $ = id => document.getElementById(id);
-let kodeEdit = null;
 
 const form = $('formProduk');
 const tabel = $('dataProduk');
@@ -26,81 +25,71 @@ function tampilkanTabel(data) {
   tabel.replaceChildren();
   data.forEach(m => {
     const tr = document.createElement('tr');
-    [m.kode_produk, m.nama_produk, m.harga, m.stok].forEach(nilai => {
+    [m.nama_produk, m.harga, m.stok].forEach(nilai => {
       const td = document.createElement('td');
       td.textContent = nilai;
       tr.appendChild(td);
     });
     const aksi = document.createElement('td');
-    const edit = document.createElement('button');
-    edit.textContent = 'Edit';
-    edit.onclick = () => mulaiEdit(m);
 
-    const hapus = document.createElement('button');
-    hapus.textContent = 'Hapus';
-    hapus.onclick = () => hapusData(m.kode_produk, m.nama_produk);
+    const buy = document.createElement('button');
+    buy.textContent = 'Beli';
+    buy.onclick = () => beliItem(m);
 
-    aksi.append(edit, hapus);
+    const bulkBuy = document.createElement('button');
+    bulkBuy.textContent = 'Beli Banyak';
+    bulkBuy.onclick = () => bulkBeli(m);
+
+    aksi.append(buy, bulkBuy);
     tr.appendChild(aksi);
     tabel.appendChild(tr);
   });
 }
 
-async function simpanData(data) {
+async function beliItem(m) {
+  const minusStok = m.stok - 1;
+
+  const bodyField = {
+    'stok': minusStok
+  };
+
   try {
-    const url = kodeEdit
-      ? API + '/' + encodeURIComponent(kodeEdit) : API;
+    const url = API + '/beli/' + m.kode_produk;
     const res = await fetch(url, {
-      method: kodeEdit ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      method: 'put',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(bodyField)
     });
     if (!res.ok) throw new Error('Gagal menyimpan data');
-    batalEdit();
     await muatData();
-    tampilPesan('Data berhasil disimpan');
-  } catch (err) { tampilPesan(err.message); }
-}
-
-function mulaiEdit(m) {
-  kodeEdit = m.kode_produk;
-  $('nama-produk').value = m.nama_produk;
-  $('harga').value = m.harga;
-  $('stok').value = m.stok;
-  $('btnSimpan').textContent = 'Perbarui';
-}
-
-function batalEdit() {
-  kodeEdit = null;
-  form.reset();
-  $('btnSimpan').textContent = 'Simpan';
-}
-
-async function hapusData(kode, nama) {
-  if (!confirm('Hapus produk ' + nama + '?')) return;
-  try {
-    const url = API + '/' + encodeURIComponent(kode);
-    const res = await fetch(url, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Gagal menghapus');
-    // if (nimEdit === nim) batalEdit();
-    await muatData();
-    tampilPesan('Data berhasil dihapus');
-  } catch (err) {
-    tampilPesan(err.message);
+    tampilPesan('Membeli 1 ' + m.nama_produk + '!');
+  } catch (e) {
+    tampilPesan(e.message);
   }
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+async function bulkBeli(m) {
+  let input = prompt("Masukkan jumlah barang yang ingin dibeli:", "1");
 
-  const data = {
-    nama_produk: $('nama-produk').value.trim(),
-    harga: $('harga').value.trim(),
-    stok: $('stok').value.trim()
+  const minusStok = m.stok - input;
+
+  const bodyField = {
+    'stok': minusStok
   };
 
-  await simpanData(data);
-});
+  try {
+    const url = API + '/beli/' + m.kode_produk;
+    const res = await fetch(url, {
+      method: 'put',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(bodyField)
+    });
+    if (!res.ok) throw new Error('Gagal menyimpan data');
+    await muatData();
+    tampilPesan('Membeli ' + input + ' ' + m.nama_produk + '!');
+  } catch (e) {
+    tampilPesan(e.message);
+  }
+}
 
-$('btnBatal').addEventListener('click', batalEdit);
 muatData();
