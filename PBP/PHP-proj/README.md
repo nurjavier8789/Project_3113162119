@@ -13,6 +13,9 @@ root/
 ├── composer.lock
 ├── vendor/
 └── public/
+    ├── buy.php
     ├── index.php
-    └── register.php
+    ├── logout.php
+    ├── register.php
+    └── tokline.php
 ```
