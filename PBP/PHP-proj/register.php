@@ -42,8 +42,8 @@
     <h1>Register</h1>
 
     <form action="register.php" method="POST">
-        <input type="text" name="username" id="username" placeholder="Username">
-        <input type="password" name="password" id="password" placeholder="Password">
+        <input type="text" name="username" id="username" placeholder="Username" required>
+        <input type="password" name="password" id="password" placeholder="Password" required>
 
         <button type="submit" name="register">Register</button>
     </form>

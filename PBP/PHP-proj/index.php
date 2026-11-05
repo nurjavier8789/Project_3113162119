@@ -1,4 +1,13 @@
 <?php
+    session_start();
+
+    if (isset($_SESSION["is_login"])) {
+        header("location: tokline.php");
+        exit;
+    } else {
+        session_abort();
+    };
+
     require_once __DIR__ . '/../vendor/autoload.php';
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
@@ -21,12 +30,16 @@
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        $result = "SELECT * FROM users";
+        $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
 
-        if (mysqli_query($koneksi, $login)) {
-            echo "Data masuk!";
+        $result = mysqli_query($koneksi, $query) or die(mysqli_error($koneksi));
+
+        if ($result->num_rows > 0) {
+            session_start();
+            $_SESSION["is_login"] = true;
+            header("location: tokline.php");
         } else {
-            echo "Ada masalah!";
+            echo "Tidak ada!";
         }
     }
 ?>
@@ -42,8 +55,8 @@
     <h1>Login</h1>
 
     <form action="index.php" method="POST">
-        <input type="text" name="username" id="username" placeholder="Username">
-        <input type="password" name="password" id="password" placeholder="Password">
+        <input type="text" name="username" id="username" placeholder="Username" required>
+        <input type="password" name="password" id="password" placeholder="Password" required>
 
         <button type="submit" name="login">Login</button>
     </form>
