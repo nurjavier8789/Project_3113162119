@@ -1,5 +1,14 @@
 <?php
-    include 'db.php';
+    require_once __DIR__ . '/../vendor/autoload.php';
+
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+    $dotenv->load();
+
+    $hostname = $_ENV['DB_HOST'];
+    $usernamedb = $_ENV['DB_USER'];
+    $passworddb = $_ENV['DB_PASS'];
+    $database = $_ENV['DB_NAME'];
+
     $koneksi = mysqli_connect($hostname, $usernamedb, $passworddb, $database);
 
     if ($koneksi) {
@@ -38,5 +47,7 @@
 
         <button type="submit" name="register">Register</button>
     </form>
+
+    <p><a href="index.php">Kembali</a></p>
 </body>
 </html>
