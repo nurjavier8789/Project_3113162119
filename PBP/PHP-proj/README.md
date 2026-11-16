@@ -13,7 +13,10 @@ root/
 ├── composer.lock
 ├── vendor/
 └── public/
+    ├── account.php
     ├── buy.php
+    ├── changepassuser.php
+    ├── conn.php
     ├── index.php
     ├── logout.php
     ├── register.php
