@@ -1,21 +1,5 @@
 <?php
-    require_once __DIR__ . '/../vendor/autoload.php';
-
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-    $dotenv->load();
-
-    $hostname = $_ENV['DB_HOST'];
-    $usernamedb = $_ENV['DB_USER'];
-    $passworddb = $_ENV['DB_PASS'];
-    $database = $_ENV['DB_NAME'];
-
-    $koneksi = mysqli_connect($hostname, $usernamedb, $passworddb, $database);
-
-    if ($koneksi) {
-        echo "Server Online<br>";
-    } else {
-        echo "Server Offline<br>";
-    }
+    include "conn.php";
 
     session_start();
 
@@ -41,7 +25,8 @@
         <title>Toko Online - Pembeli</title>
     </head>
     <body>
-        <p><a href="logout.php">Logout</a></p>
+        <p>Halo <b><?= $_SESSION["username"] ?></b>!</p>
+        <p><a href="logout.php">Logout</a> | <a href="account.php">Akun</a></p>
         <h1>Daftar Produk</h1>
         <table>
             <thead>

@@ -1,32 +1,31 @@
 <?php
-    require_once __DIR__ . '/../vendor/autoload.php';
+    include "conn.php";
 
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-    $dotenv->load();
-
-    $hostname = $_ENV['DB_HOST'];
-    $usernamedb = $_ENV['DB_USER'];
-    $passworddb = $_ENV['DB_PASS'];
-    $database = $_ENV['DB_NAME'];
-
-    $koneksi = mysqli_connect($hostname, $usernamedb, $passworddb, $database);
-
-    if ($koneksi) {
-        echo "Server Online<br>";
-    } else {
-        echo "Server Offline<br>";
-    }
+    if (isset($_SESSION["is_login"])) {
+        header("location: tokline.php");
+        exit;
+    };
 
     if (isset($_POST['register'])) {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        $regis = "INSERT INTO users(username, password) VALUES ('$username', '$password')";
+        try {
+            $regis = "INSERT INTO users(username, password) VALUES ('$username', '$password')";
+            $result = mysqli_query($koneksi, $regis);
+            
+            if ($result) {
+                echo "Data masuk!";
+            }
+        } catch (mysqli_sql_exception $e) {
+            $errorCode = $e->getCode();
+            $error_msg = match ($errorCode) {
+                1062    => "Username sudah digunakan!<br>Pilih username lain.",
+                default => "Terjadi gangguan sistem database."
+            };
 
-        if (mysqli_query($koneksi, $regis)) {
-            echo "Data masuk!";
-        } else {
-            echo "Ada masalah!";
+            echo $error_msg;
+            error_log("Error $errorCode: " . $e->getMessage());
         }
     }
 ?>

@@ -8,23 +8,7 @@
         session_abort();
     };
 
-    require_once __DIR__ . '/../vendor/autoload.php';
-
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-    $dotenv->load();
-
-    $hostname = $_ENV['DB_HOST'];
-    $usernamedb = $_ENV['DB_USER'];
-    $passworddb = $_ENV['DB_PASS'];
-    $database = $_ENV['DB_NAME'];
-
-    $koneksi = mysqli_connect($hostname, $usernamedb, $passworddb, $database);
-
-    if ($koneksi) {
-        echo "Server Online<br>";
-    } else {
-        echo "Server Offline<br>";
-    }
+    include "conn.php";
 
     if (isset($_POST['login'])) {
         $username = $_POST['username'];
@@ -37,6 +21,7 @@
         if ($result->num_rows > 0) {
             session_start();
             $_SESSION["is_login"] = true;
+            $_SESSION["username"] = $username;
             header("location: tokline.php");
         } else {
             echo "Tidak ada!";
